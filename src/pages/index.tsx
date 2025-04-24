@@ -31,10 +31,21 @@ export default function Home() {
   const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
 
-  // 检查登录状态
+  // 检查系统是否已初始化
   useEffect(() => {
-    if (!isLoggedIn) {
-      router.push('/login');
+    if (typeof window !== 'undefined') {
+      const isInitialized = localStorage.getItem('isInitialized');
+      
+      if (!isInitialized) {
+        // 系统未初始化，跳转到初始化页面
+        router.push('/initialize');
+        return;
+      }
+      
+      // 已初始化但未登录，跳转到登录页面
+      if (!isLoggedIn) {
+        router.push('/login');
+      }
     }
   }, [isLoggedIn, router]);
 

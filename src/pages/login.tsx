@@ -13,6 +13,19 @@ export default function Login() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  // 检查系统是否已初始化
+  useEffect(() => {
+    // 使用typeof window !== 'undefined'确保代码只在客户端执行
+    if (typeof window !== 'undefined') {
+      const isInitialized = localStorage.getItem('isInitialized');
+      
+      if (!isInitialized) {
+        // 系统未初始化，跳转到初始化页面
+        router.push('/initialize');
+      }
+    }
+  }, [router]);
+
   // 如果已登录，跳转到首页
   useEffect(() => {
     if (isLoggedIn) {
@@ -33,12 +46,11 @@ export default function Login() {
     setError('');
     
     try {
-      // 在实际应用中，这里应该调用API进行验证
-      // 这里仅做模拟验证
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // 获取本地存储的管理员信息
+      const adminUsername = localStorage.getItem('adminUsername');
+      const adminPassword = localStorage.getItem('adminPassword');
       
-      // 模拟验证：用户名和密码都是 admin
-      if (username === 'admin' && password === 'admin') {
+      if (username === adminUsername && password === adminPassword) {
         login({
           id: '1',
           username: username
