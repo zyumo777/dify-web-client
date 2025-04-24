@@ -42,7 +42,27 @@ export const useAppStore = create<AppState>((set, get) => ({
   fetchApps: () => {
     if (typeof window !== 'undefined') {
       const apps = appStorage.getApps();
-      const currentApp = appStorage.getCurrentApp();
+      
+      // 优先使用localStorage中保存的应用ID
+      const savedAppId = appStorage.getCurrentAppId();
+      let currentApp = null;
+      
+      if (apps.length > 0) {
+        if (savedAppId) {
+          // 查找保存的应用ID对应的应用
+          currentApp = apps.find(app => app.id === savedAppId);
+        }
+        
+        // 如果没有找到保存的应用或没有保存的应用ID，使用第一个应用
+        if (!currentApp) {
+          currentApp = apps[0];
+          // 保存为当前应用
+          if (currentApp) {
+            appStorage.saveCurrentAppId(currentApp.id);
+          }
+        }
+      }
+      
       set({ apps, currentApp });
     }
   },
@@ -93,8 +113,13 @@ export const useAppStore = create<AppState>((set, get) => ({
     });
   },
   setCurrentApp: (app: DifyApp | null) => {
-    if (typeof window !== 'undefined' && app) {
-      appStorage.saveCurrentAppId(app.id);
+    if (typeof window !== 'undefined') {
+      if (app) {
+        appStorage.saveCurrentAppId(app.id);
+      } else {
+        // 如果设置为null，清除当前应用ID
+        appStorage.saveCurrentAppId('');
+      }
     }
     set({ currentApp: app });
   },

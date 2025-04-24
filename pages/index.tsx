@@ -267,7 +267,7 @@ export default function Home() {
               <div className="max-w-md">
                 <h2 className="text-2xl font-bold mb-2">开始新的对话</h2>
                 <p className="text-gray-600 mb-8">
-                  {currentApp ? `与 ${currentApp.name} 开始对话吧！` : '请先添加一个应用'}
+                  {currentApp ? `与 ${currentApp.name}（${currentApp.groupName}）开始对话吧！` : ''}
                 </p>
                 {!currentApp && apps.length === 0 && (
                   <p className="text-gray-500 text-sm">
@@ -299,7 +299,7 @@ export default function Home() {
               onSendMessage={sendMessage}
               disabled={isLoading || !currentApp}
               showFileUpload={currentApp?.visualEnabled}
-              placeholder={currentApp ? "输入您的问题..." : "请先添加一个应用"}
+              placeholder={currentApp ? "输入您的问题..." : ""}
             />
           </div>
         </div>

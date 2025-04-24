@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { useUserStore } from '@/utils/store';
+import { useUserStore, useConversationStore } from '@/utils/store';
 import { SettingsIcon, InfoIcon, GithubIcon } from './icons';
 
 interface UserMenuProps {
@@ -9,6 +9,7 @@ interface UserMenuProps {
 
 const UserMenu: React.FC<UserMenuProps> = ({ isOpen, onClose }) => {
   const { logout } = useUserStore();
+  const { setCurrentConversation } = useConversationStore();
   const menuRef = useRef<HTMLDivElement>(null);
 
   // 处理点击外部关闭
@@ -49,6 +50,9 @@ const UserMenu: React.FC<UserMenuProps> = ({ isOpen, onClose }) => {
 
   // 处理登出点击
   const handleLogoutClick = () => {
+    // 重置当前会话
+    setCurrentConversation(null);
+    // 登出用户
     logout();
     onClose();
   };
