@@ -1,8 +1,14 @@
 import React from 'react';
 import { useUserStore, useAppStore, useConversationStore } from '@/store';
-import { ChatIcon, EditIcon, DeleteIcon, UserIcon, SettingsIcon, InfoIcon, GithubIcon } from '@/components/icons';
+import { 
+  ChatIcon, 
+  EditIcon, 
+  DeleteIcon, 
+  UserIcon
+} from '@/components/icons';
 import Button from '@/components/ui/Button';
 import UserMenu from '@/components/layout/UserMenu';
+import AppHeader from '@/components/layout/AppHeader';
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -10,7 +16,31 @@ interface SidebarProps {
   onStartNewChat: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, onStartNewChat }) => {
+// 通用的操作按钮组件
+const ActionButton: React.FC<{
+  onClick: () => void;
+  icon: React.ReactNode;
+  label?: string;
+}> = ({ onClick, icon, label }) => (
+  <Button 
+    onClick={onClick} 
+    className="w-full h-[38px] px-0 flex items-center justify-center"
+    variant="primary"
+  >
+    {label ? (
+      <div className="flex items-center gap-2">
+        {icon}
+        <span>{label}</span>
+      </div>
+    ) : (
+      <div className="flex items-center justify-center">
+        {icon}
+      </div>
+    )}
+  </Button>
+);
+
+const Sidebar: React.FC<SidebarProps> = ({ onStartNewChat }) => {
   const { user } = useUserStore();
   const { currentApp } = useAppStore();
   const { 
@@ -77,65 +107,22 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, onStar
     </div>
   );
 
-  // 如果侧边栏折叠，只显示一个最小化版本
-  if (isCollapsed) {
-    return (
-      <div className="w-16 h-full bg-gray-100 border-r border-gray-200 flex flex-col relative">
-        <div className="p-3">
-          <Button 
-            onClick={onStartNewChat} 
-            className="w-full h-[38px] px-0 flex items-center justify-center"
-            variant="primary"
-          >
-            <ChatIcon className="w-5 h-5" />
-          </Button>
-        </div>
-        
-        <div className="flex-1 overflow-y-auto">
-          <div className="p-3">
-            <button
-              onClick={onToggleCollapse}
-              className="w-full p-2 flex items-center justify-center text-gray-600 hover:bg-gray-200 rounded"
-            >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M8 4L14 10L8 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-          </div>
-        </div>
-        
-        <div className="p-3 border-t border-gray-200">
-          <div className="flex items-center justify-between" ref={menuPositionRef}>
-            <button
-              onClick={handleUserMenuClick}
-              className="flex items-center justify-center hover:bg-gray-200 rounded-md p-1"
-            >
-              <UserAvatar />
-            </button>
-            <div className="w-8 h-8"></div> {/* 占位元素，与展开状态保持对称 */}
-          </div>
-          
-          {isUserMenuOpen && (
-            <UserMenu 
-              isOpen={isUserMenuOpen} 
-              onClose={() => setIsUserMenuOpen(false)} 
-            />
-          )}
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="w-64 h-full bg-gray-100 border-r border-gray-200 flex flex-col relative">
+    <div className="w-64 h-full flex flex-col relative">
+      {/* AppHeader */}
+      <div className="w-full ml-[18px]">
+        <AppHeader />
+      </div>
+
+      {/* 开始新对话按钮 */}
       <div className="p-3">
         <Button 
-          onClick={onStartNewChat} 
-          className="w-full h-[38px]"
-          variant="primary"
+          onClick={onStartNewChat}
+          className="w-full h-[38px] px-0 flex items-center justify-center bg-white hover:bg-white/90 border-0"
+          variant="outline"
         >
           <div className="flex items-center gap-2">
-            <ChatIcon className="w-5 h-5" />
+            <ChatIcon className="w-5 h-5 text-primary" />
             <span>开始新对话</span>
           </div>
         </Button>
@@ -202,22 +189,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, onStar
         </div>
       </div>
       
-      <div className="p-3 border-t border-gray-200">
-        <div className="flex items-center justify-between" ref={menuPositionRef}>
+      <div className="p-3">
+        <div className="flex items-center justify-left" ref={menuPositionRef}>
           <button 
             className="flex items-center justify-center hover:bg-gray-200 rounded-md p-1"
             onClick={handleUserMenuClick}
           >
             <UserAvatar />
-          </button>
-          
-          <button
-            onClick={onToggleCollapse}
-            className="p-1 text-gray-500 hover:text-gray-700 rounded-full"
-          >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 4L6 10L12 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
           </button>
         </div>
       </div>

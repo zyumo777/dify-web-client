@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useUserStore, useAppStore, useConversationStore } from '@/store';
-import AppHeader from '@/components/layout/AppHeader';
 import Sidebar from '@/components/layout/Sidebar';
 import ChatInputBox from '@/components/chat/ChatInputBox';
 import ChatMessage from '@/components/chat/ChatMessage';
@@ -247,23 +246,20 @@ export default function Home() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-[#E9EBF1]">
       {/* 侧边栏 */}
       <Sidebar
-        isCollapsed={isSidebarCollapsed}
-        onToggleCollapse={toggleSidebar}
+        isCollapsed={false}
+        onToggleCollapse={() => {}}
         onStartNewChat={startNewChat}
       />
       
       {/* 主内容区 */}
-      <div className="flex-1 flex flex-col h-full bg-[#F7F8F9]">
-        {/* 头部 */}
-        <AppHeader onToggleSidebar={toggleSidebar} />
-        
-        {/* 聊天内容区 */}
-        <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 flex flex-col h-full p-2 pt-2 pr-2 pb-2">
+        {/* 聊天内容区 - 延长到页面底部 */}
+        <div className="flex-1 overflow-y-auto bg-[#F7F8F9] rounded-lg rounded-b-none shadow-sm flex flex-col">
           {messages.length > 0 ? (
-            <div>
+            <div className="flex-1 overflow-y-auto">
               {messages.map((message) => (
                 <ChatMessage
                   key={message.id}
@@ -290,8 +286,8 @@ export default function Home() {
           )}
         </div>
         
-        {/* 输入框区域 */}
-        <div className="p-4 bg-[#F7F8F9]">
+        {/* 输入框区域 - 位于聊天窗口下方但视觉上连接 */}
+        <div className="bg-[#F5F5F5] rounded-b-lg shadow-sm pt-4 pb-3">
           {isStreaming && (
             <div className="flex justify-center mb-4">
               <Button
@@ -305,7 +301,7 @@ export default function Home() {
             </div>
           )}
           
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-4xl mx-auto px-4">
             <ChatInputBox
               onSendMessage={sendMessage}
               disabled={isLoading || !currentApp}

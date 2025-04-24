@@ -3,12 +3,13 @@ import { ChevronDownIcon, AddIcon, EditIcon, DeleteIcon, CheckIcon } from '@/com
 import { useAppStore } from '@/store';
 import AddAppModal from '@/components/common/AddAppModal';
 import { DifyApp } from '@/types';
+import { RobotIcon } from '@/components/icons';
 
 // 检查是否在浏览器环境中
 const isBrowser = typeof window !== 'undefined';
 
 interface AppHeaderProps {
-  onToggleSidebar: () => void;
+  onToggleSidebar?: () => void;
 }
 
 const AppHeader: React.FC<AppHeaderProps> = ({ onToggleSidebar }) => {
@@ -65,18 +66,11 @@ const AppHeader: React.FC<AppHeaderProps> = ({ onToggleSidebar }) => {
   };
 
   return (
-    <header className="flex items-center justify-between h-14 px-4 border-b border-gray-200 bg-white">
+    <header className="flex items-center justify-between h-14 px-4 w-full">
+      <div className="flex items-center gap-2 -ml-[20px]">
+        <RobotIcon className="w-10 h-10 text-primary" />
+      </div>
       <div className="flex items-center">
-        <button 
-          onClick={onToggleSidebar}
-          className="mr-4 p-2 rounded-md hover:bg-gray-100"
-          aria-label="切换侧边栏"
-        >
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M3 5H17M3 10H17M3 15H17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-          </svg>
-        </button>
-        
         {apps.length === 0 ? (
           <button 
             onClick={handleAddApp}
@@ -87,13 +81,17 @@ const AppHeader: React.FC<AppHeaderProps> = ({ onToggleSidebar }) => {
           </button>
         ) : (
           <div className="relative">
-            <button
-              onClick={toggleDropdown}
-              className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded hover:bg-gray-100"
-            >
-              <span>{currentApp?.name || '选择应用'}</span>
-              <ChevronDownIcon className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
-            </button>
+            <div className="flex items-center">
+              <span className="text-sm font-medium truncate max-w-[150px] mr-1">
+                {currentApp?.name || '选择应用'}
+              </span>
+              <button
+                onClick={toggleDropdown}
+                className="p-1 rounded-md hover:bg-gray-100"
+              >
+                <ChevronDownIcon className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+            </div>
             
             {isDropdownOpen && (
               <div className="absolute left-0 top-full mt-1 w-64 bg-white rounded-md shadow-lg z-10 border border-gray-200">
