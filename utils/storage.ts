@@ -91,6 +91,31 @@ export const appStorage = {
     const apps = appStorage.getApps();
     const newApps = apps.filter(app => app.id !== appId);
     saveToLocalStorage('dify_apps', newApps);
+    
+    // 如果删除的是当前选中的应用，也清除当前应用记录
+    const currentAppId = getFromLocalStorage<string>('dify_current_app_id');
+    if (currentAppId === appId) {
+      removeFromLocalStorage('dify_current_app_id');
+    }
+  },
+  
+  // 保存当前选中的应用ID
+  saveCurrentAppId: (appId: string): void => {
+    saveToLocalStorage('dify_current_app_id', appId);
+  },
+  
+  // 获取当前选中的应用ID
+  getCurrentAppId: (): string | null => {
+    return getFromLocalStorage<string>('dify_current_app_id');
+  },
+  
+  // 获取当前选中的应用
+  getCurrentApp: (): DifyApp | null => {
+    const currentAppId = appStorage.getCurrentAppId();
+    if (!currentAppId) return null;
+    
+    const apps = appStorage.getApps();
+    return apps.find(app => app.id === currentAppId) || null;
   }
 };
 
@@ -141,4 +166,4 @@ export const conversationStorage = {
     const conversations = conversationStorage.getConversations();
     return conversations.find(c => c.id === conversationId) || null;
   }
-}; 
+};

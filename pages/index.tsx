@@ -9,8 +9,7 @@ import Button from '@/components/ui/Button';
 import { StopIcon } from '@/components/icons';
 import { Message } from '@/types';
 import { sendChatMessage, stopResponseStream, uploadFile } from '@/utils/api';
-import { handleStream } from '@/utils/streamParser';
-import { parseSSEResponse, decodeStreamContent } from '@/utils/streamParser';
+import { handleStream, parseSSEResponse, decodeStreamContent } from '@/utils/streamParser';
 
 export default function Home() {
   const router = useRouter();
@@ -77,6 +76,7 @@ export default function Home() {
     if (!user || !currentApp) return;
     
     setIsLoading(true);
+    setIsStreaming(true);
     
     try {
       // 创建用户消息
@@ -125,7 +125,6 @@ export default function Home() {
       };
       
       setMessages(msgs => [...msgs, assistantMessage]);
-      setIsStreaming(true);
       setStreamedContent('');
       
       // 准备文件数据
@@ -145,97 +144,77 @@ export default function Home() {
       );
       
       // 处理流式响应
-      let responseText = '';
-      let finalConversationId = currentConversation?.id || '';
-      let finalMessageId = '';
-      
-      // 处理流式响应
-      if (response.status === 200 && response.data) {
-        const reader = response.data.getReader();
-        const decoder = new TextDecoder();
-        let buffer = '';
+      if (response.status === 200) {
+        let responseText = '';
+        let finalConversationId = currentConversation?.id || '';
+        let finalMessageId = '';
         
-        try {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
+        // 使用handleStream函数处理流式响应
+        await handleStream(
+          response,
+          (streamChunk) => {
+            // 处理消息块
+            finalConversationId = streamChunk.conversation_id;
+            finalMessageId = streamChunk.message_id;
+            setCurrentTaskId(streamChunk.task_id);
             
-            const chunk = decoder.decode(value, { stream: true });
-            buffer += chunk;
+            // 解码内容
+            const content = decodeStreamContent(streamChunk.answer || '');
+            responseText += content;
+            setStreamedContent(responseText);
             
-            const lines = buffer.split('\n\n');
-            buffer = lines.pop() || '';
-            
-            for (const line of lines) {
-              if (line.trim() === '') continue;
-              
-              const parsedChunk = parseSSEResponse(line);
-              if (!parsedChunk) continue;
-              
-              if (parsedChunk.event === 'message') {
-                const streamChunk = parsedChunk as any;
-                finalConversationId = streamChunk.conversation_id;
-                finalMessageId = streamChunk.message_id;
-                setCurrentTaskId(streamChunk.task_id);
-                
-                // 解码内容
-                const content = decodeStreamContent(streamChunk.answer || '');
-                responseText += content;
-                setStreamedContent(responseText);
-                
-                // 更新助手消息
-                assistantMessage.content = responseText;
-                assistantMessage.conversationId = finalConversationId;
-                assistantMessage.id = finalMessageId;
-              } else if (parsedChunk.event === 'message_end') {
-                // 流式响应结束
-                finalConversationId = parsedChunk.conversation_id;
-                finalMessageId = parsedChunk.id;
-              }
-            }
+            // 更新助手消息
+            assistantMessage.content = responseText;
+            assistantMessage.conversationId = finalConversationId;
+            assistantMessage.id = finalMessageId;
+          },
+          (messageEndChunk) => {
+            // 处理消息结束
+            finalConversationId = messageEndChunk.conversation_id;
+            finalMessageId = messageEndChunk.id;
+          },
+          (error) => {
+            // 处理错误
+            console.error('流式处理错误:', error);
           }
-        } catch (error) {
-          console.error('流式处理错误:', error);
+        );
+        
+        // 更新最终消息
+        setStreamedContent('');
+        
+        // 更新消息状态
+        const finalMessages = [userMessage, { ...assistantMessage, content: responseText }];
+        
+        // 如果是新会话，创建会话
+        if (!currentConversation) {
+          const newConversation = {
+            id: finalConversationId,
+            name: content.substring(0, 30) + (content.length > 30 ? '...' : ''),
+            appId: currentApp.id,
+            userId: user.id,
+            messages: finalMessages,
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+          };
+          
+          addConversation(newConversation);
+        } else {
+          // 添加消息到现有会话
+          userMessage.conversationId = finalConversationId;
+          assistantMessage.conversationId = finalConversationId;
+          assistantMessage.content = responseText;
+          assistantMessage.id = finalMessageId;
+          
+          addMessageToConversation(currentConversation.id, userMessage);
+          addMessageToConversation(currentConversation.id, assistantMessage);
         }
       }
-      
-      // 更新最终消息
-      setStreamedContent('');
-      setIsStreaming(false);
-      setCurrentTaskId(null);
-      
-      // 更新消息状态
-      const finalMessages = [userMessage, { ...assistantMessage, content: responseText }];
-      
-      // 如果是新会话，创建会话
-      if (!currentConversation) {
-        const newConversation = {
-          id: finalConversationId,
-          name: content.substring(0, 30) + (content.length > 30 ? '...' : ''),
-          appId: currentApp.id,
-          userId: user.id,
-          messages: finalMessages,
-          createdAt: Date.now(),
-          updatedAt: Date.now()
-        };
-        
-        addConversation(newConversation);
-      } else {
-        // 添加消息到现有会话
-        userMessage.conversationId = finalConversationId;
-        assistantMessage.conversationId = finalConversationId;
-        assistantMessage.content = responseText;
-        assistantMessage.id = finalMessageId;
-        
-        addMessageToConversation(currentConversation.id, userMessage);
-        addMessageToConversation(currentConversation.id, assistantMessage);
-      }
-      
     } catch (error) {
       console.error('发送消息失败:', error);
     } finally {
       setIsLoading(false);
       setIsStreaming(false);
+      setCurrentTaskId(null);
     }
   };
 

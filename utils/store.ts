@@ -37,17 +37,27 @@ interface AppState {
 
 export const useAppStore = create<AppState>((set, get) => ({
   apps: typeof window !== 'undefined' ? appStorage.getApps() : [],
-  currentApp: null,
+  currentApp: typeof window !== 'undefined' ? appStorage.getCurrentApp() : null,
   isLoading: false,
   fetchApps: () => {
     if (typeof window !== 'undefined') {
       const apps = appStorage.getApps();
-      set({ apps });
+      const currentApp = appStorage.getCurrentApp();
+      set({ apps, currentApp });
     }
   },
   addApp: (app: DifyApp) => {
     appStorage.addApp(app);
-    set((state) => ({ apps: [...state.apps, app] }));
+    set((state) => ({ 
+      apps: [...state.apps, app],
+      // 如果是第一个应用，自动设为当前应用
+      currentApp: state.apps.length === 0 ? app : state.currentApp
+    }));
+    
+    // 如果是第一个应用，保存当前应用ID
+    if (typeof window !== 'undefined' && get().apps.length === 1) {
+      appStorage.saveCurrentAppId(app.id);
+    }
   },
   updateApp: (app: DifyApp) => {
     appStorage.updateApp(app);
@@ -58,12 +68,34 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
   removeApp: (appId: string) => {
     appStorage.removeApp(appId);
-    set((state) => ({
-      apps: state.apps.filter((app) => app.id !== appId),
-      currentApp: state.currentApp?.id === appId ? null : state.currentApp,
-    }));
+    set((state) => {
+      const filteredApps = state.apps.filter((app) => app.id !== appId);
+      
+      // 如果删除的是当前应用，选择第一个应用作为当前应用或设为null
+      let newCurrentApp = state.currentApp;
+      if (state.currentApp?.id === appId) {
+        newCurrentApp = filteredApps.length > 0 ? filteredApps[0] : null;
+        
+        // 更新存储中的当前应用ID
+        if (typeof window !== 'undefined') {
+          if (newCurrentApp) {
+            appStorage.saveCurrentAppId(newCurrentApp.id);
+          } else {
+            appStorage.saveCurrentAppId('');
+          }
+        }
+      }
+      
+      return {
+        apps: filteredApps,
+        currentApp: newCurrentApp,
+      };
+    });
   },
   setCurrentApp: (app: DifyApp | null) => {
+    if (typeof window !== 'undefined' && app) {
+      appStorage.saveCurrentAppId(app.id);
+    }
     set({ currentApp: app });
   },
 }));
@@ -183,4 +215,4 @@ export const useConversationStore = create<ConversationState>((set, get) => ({
       });
     }
   },
-})); 
+}));

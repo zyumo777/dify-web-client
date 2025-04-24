@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from './ui/Modal';
 import Input from './ui/Input';
 import Button from './ui/Button';
@@ -23,12 +23,37 @@ const AddAppModal: React.FC<AddAppModalProps> = ({ isOpen, onClose, appToEdit })
     groupName: string;
     apiUrl: string;
     apiKey: string;
-  }>(appToEdit || {
+  }>({
     name: '',
     groupName: '',
     apiUrl: '',
     apiKey: '',
   });
+
+  // 当appToEdit变化或模态框打开时，更新表单数据
+  useEffect(() => {
+    if (isOpen) {
+      if (appToEdit) {
+        setFormData({
+          id: appToEdit.id,
+          name: appToEdit.name || '',
+          groupName: appToEdit.groupName || '',
+          apiUrl: appToEdit.apiUrl || '',
+          apiKey: appToEdit.apiKey || '',
+        });
+      } else {
+        // 重置表单
+        setFormData({
+          name: '',
+          groupName: '',
+          apiUrl: '',
+          apiKey: '',
+        });
+      }
+      // 重置错误信息
+      setError('');
+    }
+  }, [appToEdit, isOpen]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

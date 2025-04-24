@@ -25,6 +25,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, onStar
   const [isEditing, setIsEditing] = React.useState<string | null>(null);
   const [editName, setEditName] = React.useState('');
   const [isUserMenuOpen, setIsUserMenuOpen] = React.useState(false);
+  const menuPositionRef = React.useRef<HTMLDivElement>(null);
 
   // 选择会话
   const handleSelectConversation = (conversationId: string) => {
@@ -71,10 +72,22 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, onStar
     removeConversation(conversationId);
   };
 
+  // 用户菜单按钮点击
+  const handleUserMenuClick = () => {
+    setIsUserMenuOpen(true);
+  };
+
+  // 统一的用户图标组件
+  const UserAvatar = () => (
+    <div className="w-8 h-8 min-w-[2rem] min-h-[2rem] bg-gray-300 rounded-full flex items-center justify-center">
+      <UserIcon className="w-5 h-5 text-gray-600" />
+    </div>
+  );
+
   // 如果侧边栏折叠，只显示一个最小化版本
   if (isCollapsed) {
     return (
-      <div className="w-16 h-full bg-gray-100 border-r border-gray-200 flex flex-col">
+      <div className="w-16 h-full bg-gray-100 border-r border-gray-200 flex flex-col relative">
         <div className="p-3">
           <Button 
             onClick={onStartNewChat} 
@@ -96,26 +109,27 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, onStar
           </button>
         </div>
         
-        <div className="mt-auto p-3">
+        <div className="mt-auto p-3 flex justify-center" ref={menuPositionRef}>
           <button
-            onClick={() => setIsUserMenuOpen(true)}
-            className="w-full p-2 flex items-center justify-center text-gray-600 hover:bg-gray-200 rounded"
+            onClick={handleUserMenuClick}
+            className="flex items-center justify-center hover:bg-gray-200 rounded-md p-1"
           >
-            <UserIcon className="w-5 h-5" />
+            <UserAvatar />
           </button>
-          {isUserMenuOpen && (
-            <UserMenu 
-              isOpen={isUserMenuOpen} 
-              onClose={() => setIsUserMenuOpen(false)} 
-            />
-          )}
         </div>
+        
+        {isUserMenuOpen && (
+          <UserMenu 
+            isOpen={isUserMenuOpen} 
+            onClose={() => setIsUserMenuOpen(false)} 
+          />
+        )}
       </div>
     );
   }
 
   return (
-    <div className="w-64 h-full bg-gray-100 border-r border-gray-200 flex flex-col">
+    <div className="w-64 h-full bg-gray-100 border-r border-gray-200 flex flex-col relative">
       <div className="p-3">
         <Button 
           onClick={onStartNewChat} 
@@ -201,12 +215,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, onStar
       
       <div className="p-3 border-t border-gray-200">
         <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center mr-2">
-              <UserIcon className="w-5 h-5 text-gray-600" />
-            </div>
-            <div className="text-sm font-medium truncate">{user?.username}</div>
-          </div>
+          <button 
+            className="flex items-center justify-center hover:bg-gray-200 rounded-md p-1"
+            onClick={handleUserMenuClick}
+          >
+            <UserAvatar />
+          </button>
           
           <button
             onClick={onToggleCollapse}

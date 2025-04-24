@@ -34,10 +34,10 @@ export const handleStream = (
   onChunk: (chunk: StreamChunk) => void,
   onComplete: (messageEndChunk: MessageEndChunk) => void,
   onError: (error: Error) => void
-) => {
+): Promise<void> => {
   if (!response.body) {
     onError(new Error('响应体为空'));
-    return;
+    return Promise.reject(new Error('响应体为空'));
   }
 
   const reader = response.body.getReader();
@@ -48,6 +48,17 @@ export const handleStream = (
     try {
       const { done, value } = await reader.read();
       if (done) {
+        // 处理缓冲区中的最后一个事件（如果有）
+        if (buffer.trim() !== '') {
+          const parsedChunk = parseSSEResponse(buffer);
+          if (parsedChunk) {
+            if (parsedChunk.event === 'message_end') {
+              onComplete(parsedChunk as MessageEndChunk);
+            } else if (parsedChunk.event === 'message') {
+              onChunk(parsedChunk as StreamChunk);
+            }
+          }
+        }
         return;
       }
 
@@ -86,10 +97,8 @@ export const handleStream = (
   };
 
   // 开始处理流
-  processStream().catch(onError);
-
-  // 返回取消函数
-  return () => {
-    reader.cancel().catch(console.error);
-  };
+  return processStream().catch((error) => {
+    onError(error);
+    throw error;
+  });
 };

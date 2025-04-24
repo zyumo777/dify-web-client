@@ -35,7 +35,6 @@ export const sendChatMessage = async (
   files?: { type: string; transfer_method: string; url?: string; upload_file_id?: string }[]
 ) => {
   try {
-    const api = createApiInstance(app);
     const payload = {
       inputs: {},
       query,
@@ -45,10 +44,19 @@ export const sendChatMessage = async (
       files: files || []
     };
 
-    // 使用axios创建流式响应
-    const response = await api.post('/chat-messages', payload, {
-      responseType: 'stream',
+    // 使用fetch处理流式响应
+    const response = await fetch(`${app.apiUrl}/chat-messages`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${app.apiKey}`
+      },
+      body: JSON.stringify(payload)
     });
+    
+    if (!response.ok) {
+      throw new Error(`API请求失败: ${response.status}`);
+    }
     
     return response;
   } catch (error) {
