@@ -245,7 +245,7 @@ export default function Home() {
       />
       
       {/* 主内容区 */}
-      <div className="flex-1 flex flex-col h-full">
+      <div className="flex-1 flex flex-col h-full bg-[#F7F8F9]">
         {/* 头部 */}
         <AppHeader onToggleSidebar={toggleSidebar} />
         
@@ -280,7 +280,7 @@ export default function Home() {
         </div>
         
         {/* 输入框区域 */}
-        <div className="p-4 bg-gray-50 border-t border-gray-200">
+        <div className="p-4 bg-[#F7F8F9]">
           {isStreaming && (
             <div className="flex justify-center mb-4">
               <Button
@@ -294,12 +294,14 @@ export default function Home() {
             </div>
           )}
           
-          <ChatInputBox
-            onSendMessage={sendMessage}
-            disabled={isLoading || !currentApp}
-            showFileUpload={currentApp?.visualEnabled}
-            placeholder={currentApp ? "输入您的问题..." : "请先添加一个应用"}
-          />
+          <div className="max-w-4xl mx-auto">
+            <ChatInputBox
+              onSendMessage={sendMessage}
+              disabled={isLoading || !currentApp}
+              showFileUpload={currentApp?.visualEnabled}
+              placeholder={currentApp ? "输入您的问题..." : "请先添加一个应用"}
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
     "@types/markdown-it": "^14.1.2",
     "autoprefixer": "^10.4.16",
     "axios": "^1.6.0",
