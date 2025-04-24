@@ -75,36 +75,14 @@ export const SendIcon: React.FC<IconProps> = ({ className, onClick }) => {
     <svg 
       width="24" 
       height="24" 
-      viewBox="0 0 24 24" 
+      viewBox="0 0 1024 1024"
       fill="none" 
       xmlns="http://www.w3.org/2000/svg"
       className={className}
       onClick={onClick}
     >
-      <path d="M22 2L11 13M22 2L15 22L11 13M11 13L2 9L22 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-};
-
-export const PinIcon: React.FC<IconProps & { filled?: boolean }> = ({ className, onClick, filled }) => {
-  return (
-    <svg 
-      width="24" 
-      height="24" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-      onClick={onClick}
-    >
-      <path 
-        d="M12 21V16M12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16ZM12 8V4M9 4H15" 
-        stroke="currentColor" 
-        strokeWidth="2" 
-        strokeLinecap="round" 
-        strokeLinejoin="round"
-        fill={filled ? "currentColor" : "none"}
-      />
+      <path d="M1014.229333 143.530667a42.666667 42.666667 0 0 1 5.802667 45.141333l-305.066667 655.146667a42.666667 42.666667 0 0 1-63.146666 16.981333l-234.666667-163.797333a42.666667 42.666667 0 0 1 48.853333-69.973334l193.024 134.741334 245.888-528.085334L146.816 422.656l156.842667 104.234667a42.666667 42.666667 0 0 0 45.056 1.365333l235.690666-137.088a42.666667 42.666667 0 0 1 42.922667 73.770667L391.637333 602.026667a128 128 0 0 1-135.253333-4.053334L19.072 440.192a42.666667 42.666667 0 0 1 13.312-76.928l938.666667-233.984a42.666667 42.666667 0 0 1 43.221333 14.250667z" stroke="currentColor" fill="#75C82B" />
+      <path d="M481.408 701.098667a42.666667 42.666667 0 0 1 1.92 60.288L329.813333 925.184A42.666667 42.666667 0 0 1 256 896v-163.797333a42.666667 42.666667 0 1 1 85.333333 0v55.893333l79.786667-85.077333a42.666667 42.666667 0 0 1 60.288-1.92z" stroke="currentColor" fill="#75C82B" />
     </svg>
   );
 };

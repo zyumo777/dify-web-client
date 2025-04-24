@@ -1,6 +1,6 @@
 import React from 'react';
 import { useUserStore, useAppStore, useConversationStore } from '@/utils/store';
-import { ChatIcon, PinIcon, EditIcon, DeleteIcon, UserIcon, SettingsIcon, InfoIcon, GithubIcon } from './icons';
+import { ChatIcon, EditIcon, DeleteIcon, UserIcon, SettingsIcon, InfoIcon, GithubIcon } from './icons';
 import Button from './ui/Button';
 import UserMenu from './UserMenu';
 
@@ -17,7 +17,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, onStar
     conversations, 
     currentConversation, 
     setCurrentConversation,
-    togglePinConversation,
     updateConversationName,
     removeConversation
   } = useConversationStore();
@@ -60,12 +59,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, onStar
     }
   };
 
-  // 固定/取消固定会话
-  const handleTogglePin = (conversationId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    togglePinConversation(conversationId);
-  };
-
   // 删除会话
   const handleDeleteConversation = (conversationId: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -91,39 +84,44 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, onStar
         <div className="p-3">
           <Button 
             onClick={onStartNewChat} 
-            className="w-full p-2 flex items-center justify-center"
+            className="w-full h-[38px] px-0 flex items-center justify-center"
             variant="primary"
           >
             <ChatIcon className="w-5 h-5" />
           </Button>
         </div>
         
-        <div className="p-3">
-          <button
-            onClick={onToggleCollapse}
-            className="w-full p-2 flex items-center justify-center text-gray-600 hover:bg-gray-200 rounded"
-          >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M8 4L14 10L8 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
+        <div className="flex-1 overflow-y-auto">
+          <div className="p-3">
+            <button
+              onClick={onToggleCollapse}
+              className="w-full p-2 flex items-center justify-center text-gray-600 hover:bg-gray-200 rounded"
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 4L14 10L8 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          </div>
         </div>
         
-        <div className="mt-auto p-3 flex justify-center" ref={menuPositionRef}>
-          <button
-            onClick={handleUserMenuClick}
-            className="flex items-center justify-center hover:bg-gray-200 rounded-md p-1"
-          >
-            <UserAvatar />
-          </button>
+        <div className="p-3 border-t border-gray-200">
+          <div className="flex items-center justify-between" ref={menuPositionRef}>
+            <button
+              onClick={handleUserMenuClick}
+              className="flex items-center justify-center hover:bg-gray-200 rounded-md p-1"
+            >
+              <UserAvatar />
+            </button>
+            <div className="w-8 h-8"></div> {/* 占位元素，与展开状态保持对称 */}
+          </div>
+          
+          {isUserMenuOpen && (
+            <UserMenu 
+              isOpen={isUserMenuOpen} 
+              onClose={() => setIsUserMenuOpen(false)} 
+            />
+          )}
         </div>
-        
-        {isUserMenuOpen && (
-          <UserMenu 
-            isOpen={isUserMenuOpen} 
-            onClose={() => setIsUserMenuOpen(false)} 
-          />
-        )}
       </div>
     );
   }
@@ -133,7 +131,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, onStar
       <div className="p-3">
         <Button 
           onClick={onStartNewChat} 
-          className="w-full"
+          className="w-full h-[38px]"
           variant="primary"
         >
           <div className="flex items-center gap-2">
@@ -178,15 +176,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, onStar
                       {!isEditing && (
                         <>
                           <button
-                            onClick={(e) => handleTogglePin(conversation.id, e)}
-                            className="p-1 text-gray-500 hover:text-gray-700 rounded-full"
-                          >
-                            <PinIcon 
-                              className="w-4 h-4" 
-                              filled={conversation.pinned} 
-                            />
-                          </button>
-                          <button
                             onClick={(e) => handleStartEditing(conversation.id, conversation.name, e)}
                             className="p-1 text-gray-500 hover:text-gray-700 rounded-full"
                           >
@@ -214,7 +203,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, onStar
       </div>
       
       <div className="p-3 border-t border-gray-200">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between" ref={menuPositionRef}>
           <button 
             className="flex items-center justify-center hover:bg-gray-200 rounded-md p-1"
             onClick={handleUserMenuClick}

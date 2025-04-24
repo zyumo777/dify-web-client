@@ -41,7 +41,6 @@ export interface Conversation {
   messages: Message[];
   createdAt: number;
   updatedAt: number;
-  pinned?: boolean;
 }
 
 // API响应类型

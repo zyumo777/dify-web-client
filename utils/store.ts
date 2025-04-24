@@ -112,7 +112,6 @@ interface ConversationState {
   setCurrentConversation: (conversation: Conversation | null) => void;
   addMessageToConversation: (conversationId: string, message: Message) => void;
   updateConversationName: (conversationId: string, name: string) => void;
-  togglePinConversation: (conversationId: string) => void;
 }
 
 export const useConversationStore = create<ConversationState>((set, get) => ({
@@ -122,12 +121,8 @@ export const useConversationStore = create<ConversationState>((set, get) => ({
   fetchConversations: (userId: string, appId: string) => {
     if (typeof window !== 'undefined') {
       const conversations = conversationStorage.getUserAppConversations(userId, appId);
-      // 排序：先固定在前，再按更新时间降序
-      const sortedConversations = [...conversations].sort((a, b) => {
-        if (a.pinned && !b.pinned) return -1;
-        if (!a.pinned && b.pinned) return 1;
-        return b.updatedAt - a.updatedAt;
-      });
+      // 按更新时间降序排序
+      const sortedConversations = [...conversations].sort((a, b) => b.updatedAt - a.updatedAt);
       set({ conversations: sortedConversations });
     }
   },
@@ -193,26 +188,5 @@ export const useConversationStore = create<ConversationState>((set, get) => ({
           : state.currentConversation,
       }));
     }
-  },
-  togglePinConversation: (conversationId: string) => {
-    const conversation = conversationStorage.getConversation(conversationId);
-    if (conversation) {
-      conversation.pinned = !conversation.pinned;
-      conversationStorage.updateConversation(conversation);
-      
-      const conversations = [...get().conversations];
-      const sortedConversations = conversations.sort((a, b) => {
-        if (a.pinned && !b.pinned) return -1;
-        if (!a.pinned && b.pinned) return 1;
-        return b.updatedAt - a.updatedAt;
-      });
-      
-      set({
-        conversations: sortedConversations,
-        currentConversation: get().currentConversation?.id === conversationId 
-          ? conversation 
-          : get().currentConversation,
-      });
-    }
-  },
+  }
 }));
