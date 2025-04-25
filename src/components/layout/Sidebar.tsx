@@ -11,34 +11,8 @@ import UserMenu from '@/components/layout/UserMenu';
 import AppHeader from '@/components/layout/AppHeader';
 
 interface SidebarProps {
-  isCollapsed: boolean;
-  onToggleCollapse: () => void;
   onStartNewChat: () => void;
 }
-
-// 通用的操作按钮组件
-const ActionButton: React.FC<{
-  onClick: () => void;
-  icon: React.ReactNode;
-  label?: string;
-}> = ({ onClick, icon, label }) => (
-  <Button 
-    onClick={onClick} 
-    className="w-full h-[38px] px-0 flex items-center justify-center"
-    variant="primary"
-  >
-    {label ? (
-      <div className="flex items-center gap-2">
-        {icon}
-        <span>{label}</span>
-      </div>
-    ) : (
-      <div className="flex items-center justify-center">
-        {icon}
-      </div>
-    )}
-  </Button>
-);
 
 const Sidebar: React.FC<SidebarProps> = ({ onStartNewChat }) => {
   const { user } = useUserStore();

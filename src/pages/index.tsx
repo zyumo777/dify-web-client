@@ -23,7 +23,6 @@ export default function Home() {
     fetchConversations
   } = useConversationStore();
 
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamedContent, setStreamedContent] = useState('');
@@ -64,11 +63,6 @@ export default function Home() {
       setMessages([]);
     }
   }, [currentConversation]);
-
-  // 切换侧边栏
-  const toggleSidebar = () => {
-    setIsSidebarCollapsed(!isSidebarCollapsed);
-  };
 
   // 开始新会话
   const startNewChat = () => {
@@ -248,14 +242,10 @@ export default function Home() {
   return (
     <div className="flex h-screen bg-[#E9EBF1]">
       {/* 侧边栏 */}
-      <Sidebar
-        isCollapsed={false}
-        onToggleCollapse={() => {}}
-        onStartNewChat={startNewChat}
-      />
+      <Sidebar onStartNewChat={startNewChat} />
       
       {/* 主内容区 */}
-      <div className="flex-1 flex flex-col h-full p-2 pt-2 pr-2 pb-2">
+      <div className="flex-1 flex flex-col h-full p-2">
         {/* 聊天内容区 - 延长到页面底部 */}
         <div className="flex-1 overflow-y-auto bg-[#F7F8F9] rounded-lg rounded-b-none shadow-sm flex flex-col">
           {messages.length > 0 ? (
@@ -287,7 +277,7 @@ export default function Home() {
         </div>
         
         {/* 输入框区域 - 位于聊天窗口下方但视觉上连接 */}
-        <div className="bg-[#F5F5F5] rounded-b-lg shadow-sm pt-4 pb-3">
+        <div className="bg-[#F7F8F9] rounded-b-lg shadow-sm pt-4 pb-3">
           {isStreaming && (
             <div className="flex justify-center mb-4">
               <Button

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Message } from '@/types';
 import MarkdownRenderer from '@/components/ui/MarkdownRenderer';
-import { LogoIcon, UserIcon } from '@/components/icons';
+import { RobotIcon, ChatUserIcon } from '@/components/icons';
 
 interface ChatMessageProps {
   message: Message;
@@ -30,8 +30,8 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           {/* 非用户消息显示头像 */}
           {!isUser && (
             <div className="flex-shrink-0 mt-1">
-              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                <LogoIcon className="w-5 h-5 text-white" />
+              <div className="w-8 h-8 rounded-full flex items-center justify-center">
+                <RobotIcon className="w-8 h-8 text-primary" />
               </div>
             </div>
           )}
@@ -82,8 +82,8 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           {/* 用户消息显示头像 */}
           {isUser && (
             <div className="flex-shrink-0 mt-1">
-              <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                <UserIcon className="w-5 h-5 text-gray-600" />
+              <div className="w-8 h-8 rounded-full flex items-center justify-center">
+                <ChatUserIcon className="w-8 h-8 text-primary" />
               </div>
             </div>
           )}

@@ -176,7 +176,7 @@ const ChatInputBox: React.FC<ChatInputBoxProps> = ({
       
       {/* 文件预览区域 */}
       {files.length > 0 && (
-        <div className="flex flex-wrap gap-2 p-2 mb-2 border rounded-lg bg-white">
+        <div className="flex flex-wrap gap-2 p-2 mb-2 rounded-lg bg-white">
           {files.map((file, index) => (
             <div key={index} className="relative group">
               {file.type.startsWith('image/') ? (

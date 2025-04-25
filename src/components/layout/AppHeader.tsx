@@ -8,11 +8,7 @@ import { RobotIcon } from '@/components/icons';
 // 检查是否在浏览器环境中
 const isBrowser = typeof window !== 'undefined';
 
-interface AppHeaderProps {
-  onToggleSidebar?: () => void;
-}
-
-const AppHeader: React.FC<AppHeaderProps> = ({ onToggleSidebar }) => {
+const AppHeader: React.FC = () => {
   const { currentApp, apps, setCurrentApp, removeApp, fetchApps } = useAppStore();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isAddAppModalOpen, setIsAddAppModalOpen] = useState(false);
